@@ -1,0 +1,36 @@
+# Selecting Nodes
+/bookstore
+/bookstore//book
+//book
+
+# Selecting Several Paths
+/bookstore/book/title | //price
+
+# Predicates (number)
+/bookstore/book[1]
+/bookstore/book[last()-1]
+/bookstore/book[position()<3]
+
+# Predicates (boolean)
+/bookstore/book[lang='en']
+/bookstore/book[price>35.50]
+/bookstore/book[price>35.50]/title
+
+# Selecting Unknown Nodes
+/bookstore/*
+
+# XPath Operators
+/bookstore/book[1+2]/title
+/bookstore/book[count(author)>1+2]/title
+-
+*
+div
+=
+!=
+<
+<=
+>
+>=
+or
+and
+mod
