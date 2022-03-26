@@ -1,0 +1,137 @@
+// Location Paths
+location_path : relative_location_path	
+            | absolute_location_path
+
+absolute_location_path : "/" relative_location_path ?
+                    | abbreviated_absolute_location_path
+
+relative_location_path : step	
+                    | relative_location_path "/" step	
+                    | abbreviated_relative_location_path	
+
+// Location Steps
+step : axis_specifier node_test predicate*	
+    | abbreviated_step 
+
+axis_specifier : AXIS_NAME "::"	
+            | abbreviated_axis_specifier
+
+// Axes
+AXIS_NAME : "ancestor"	
+        | "ancestor-or-self"	
+        | "attribute"	
+        | "child"	
+        | "descendant"	
+        | "descendant-or-self"	
+        | "following"	
+        | "following-sibling"	
+        | "namespace"	
+        | "parent"	
+        | "preceding"	
+        | "preceding-sibling"	
+        | "self"
+
+// Node Tests
+node_test : NAME_TEST	
+        | NODE_TYPE "(" ")"	
+        | "processing-instruction" "(" LITERAL ")"	
+
+// Predicates
+predicate : "[" predicate_expr "]"	
+predicate_expr : expr
+
+// Abbreviations
+abbreviated_absolute_location_path : "//" relative_location_path
+abbreviated_relative_location_path : relative_location_path "//" step	
+abbreviated_step : "."	
+                | ".."
+abbreviated_axis_specifier : "@"?
+
+// Expressions Basic
+expr : or_expr
+primary_expr : VARIABLE_REFERENCE	
+            | "(" expr ")"	
+            | LITERAL	
+            | NUMBER	
+            | function_call
+
+// Function Calls
+function_call : FUNCTION_NAME "(" ( argument ( "," argument )* )? ")"
+argument : expr
+
+// Node-sets
+union_expr : path_expr	
+        | union_expr "|" path_expr
+path_expr : location_path	
+        | filter_expr	
+        | filter_expr "/" relative_location_path	
+        | filter_expr "//" relative_location_path
+filter_expr : primary_expr	
+        | filter_expr predicate
+
+// Booleans
+or_expr : and_expr	
+        | or_expr "or" and_expr
+and_expr : equality_expr	
+        | and_expr "and" equality_expr
+equality_expr : relational_expr	
+            | equality_expr "=" relational_expr	
+            | equality_expr "!=" relational_expr
+relational_expr : additive_expr	
+            | relational_expr "<" additive_expr	
+            | relational_expr ">" additive_expr	
+            | relational_expr "<=" additive_expr	
+            | relational_expr ">=" additive_expr	
+
+// Numbers
+additive_expr : multiplicative_expr	
+            | additive_expr "+" multiplicative_expr	
+            | additive_expr "-" multiplicative_expr
+multiplicative_expr : unary_expr	
+                | multiplicative_expr MULTIPLY_OPERATOR unary_expr	
+                | multiplicative_expr "div" unary_expr	
+                | multiplicative_expr "mod" unary_expr
+unary_expr : union_expr	
+        | "-" unary_expr
+
+// Strings
+
+// Lexical Structure
+EXPR_TOKEN : "(" | ")" | "[" | "]" | "." | ".." | "@" | "," | "::"	
+        | NAME_TEST	
+        | NODE_TYPE	
+        | OPERATOR	
+        | FUNCTION_NAME	
+        | AXIS_NAME	
+        | LITERAL	
+        | NUMBER	
+        | VARIABLE_REFERENCE
+LITERAL : "\"" _STRING_ESC_INNER  "\""	
+        | "'" _STRING_ESC_INNER  "'"
+// NUMBER : NUMBER
+OPERATOR : OPERATOR_NAME	
+        | MULTIPLY_OPERATOR	
+        | "/" | "//" | "|" | "+" | "-" | "=" | "!=" | "<" | "<=" | ">" | ">="	
+OPERATOR_NAME : "and" | "or" | "mod" | "div"
+MULTIPLY_OPERATOR : "*"
+// FUNCTION_NAME : QName - NODE_TYPE
+// VARIABLE_REFERENCE : "$" QName
+// NAME_TEST : "*"	
+//         | NCName ":" "*"	
+//         | QName
+// FUNCTION_NAME : ESCAPED_STRING - NODE_TYPE
+NAME_TEST: CNAME
+FUNCTION_NAME : CNAME 
+VARIABLE_REFERENCE : "$" CNAME 
+
+
+NODE_TYPE : "comment"	
+        | "text"	
+        | "processing-instruction"	
+        | "node"
+
+%import common.CNAME
+%import common._STRING_ESC_INNER
+%import common.WS
+%import common.NUMBER
+%ignore WS
