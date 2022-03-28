@@ -5,6 +5,7 @@ if __package__:
     from .evaluator import XpathEvaluator1
     from .mongodb_helper import db_connect
     from .schema_tree import SchemaTree
+    from .location_tree import LocationNode
 else:
     from evaluator import XpathEvaluator1
     from mongodb_helper import db_connect
@@ -56,8 +57,9 @@ class Solver:
         expr = expr.replace('/child::{}/child::{}'.format(self.config['COLLECTION'], self.config['COLLECTION_ITEM']), '/__root__')
         res = self.parser.parse(expr)
         print(res.pretty())
-        self.evaluator.transform(res)
-        res = self.colllection.aggregate(self.evaluator.pipeline_command)
+        node = self.evaluator.transform(res) # type: LocationNode
+        aggs, _ = node.generate(self.tree, [self.tree.root], is_top=True)
+        res = self.colllection.aggregate(aggs)
 
         ret = []
         for obj in res:

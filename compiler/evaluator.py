@@ -1,9 +1,14 @@
 from lark import Transformer, Tree
 from lark.lexer import Token
+
 if __package__:
     from .schema_tree import SchemaTree
+    from .predicate_tree import PredicateNode
+    from .location_tree import LocationNode
 else:
     from schema_tree import SchemaTree
+    from predicate_tree import PredicateNode
+    from location_tree import LocationNode
 
 class XpathEvaluator1(Transformer):
     def __init__(self, tree: SchemaTree):
@@ -15,28 +20,33 @@ class XpathEvaluator1(Transformer):
         pass
 
     def location_path(self, parts):
+        node = LocationNode()
         i = 0
-        nodes = []
         while i < len(parts):
             part = parts[i]
+            axis = 'child'
             if isinstance(part, Token) and part.type in {'SLASH', 'DOUBLE_SLASH'}:
-                print(nodes)
-                relation = part
+                axis = 'child' if part.type == 'SLASH' else 'descendant'
                 i += 1
-                part = parts[i] # type: Tree
-                for child in part.children:
-                    if isinstance(child, Token) and child.type == 'NAME_TEST':
-                        name = child.value # type: str
-                        if name == '__root__':
-                            nodes = [self.tree.root]
-                            break
-                        nodes = self.tree.find(nodes, relation.type, name)
-                        break
+            step = parts[i]  # type: Tree
+            for j, child in enumerate(step.children):
+                if isinstance(child, Token) and child.type == 'NAME_TEST':
+                    name = child.value # type: str
+                    node.add_step(axis=axis, name=name, predicates=step.children[j + 1:])
+                    break
             i += 1
-        self.pipeline_command.append({
-            '$project': {
-                '_id': 0,
-                **{str(node).split('.')[-1]: '$' + str(node) for node in nodes}
-            }
-        })
-        print(nodes)
+        return node
+
+    def and_expr(self, parts):
+        lhs, op, rhs = parts
+        ret = PredicateNode(lhs, op, rhs)
+        return ret
+
+    def relational_expr(self, parts):
+        lhs, op, rhs = parts
+        ret = PredicateNode(lhs, op, rhs)
+        return ret
+
+    def predicate(self, parts):
+        assert len(parts) == 1
+        return parts[0]

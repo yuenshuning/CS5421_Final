@@ -1,5 +1,5 @@
 // Location Paths
-?location_path : _relative_location_path	
+location_path : _relative_location_path	
             | _absolute_location_path
 
 _absolute_location_path : SLASH _relative_location_path ?
