@@ -29,6 +29,8 @@ class SchemaTree:
     def _build_tree(self, cur_node: SchemaNode, d: Dict):
         for k, v in d.items():
             child = SchemaNode(k, cur_node, [])
+            if isinstance(v, list) and len(v):
+                v = v[0]
             if isinstance(v, dict):
                 self._build_tree(child, v)
             cur_node.children.append(child)

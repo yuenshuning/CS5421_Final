@@ -1,6 +1,10 @@
 from lark import Lark
+import json
+
 if __package__:
     from .evaluator import XpathEvaluator1
+    from .mongodb_helper import db_connect
+    from .schema_tree import SchemaTree
 else:
     from evaluator import XpathEvaluator1
     from mongodb_helper import db_connect
@@ -40,10 +44,31 @@ def test_parse():
 
 class Solver:
     def __init__(self, config):
-        pass
+        self.config = config
+        self.colllection = db_connect(config['URI'], config['DATABASE'])[config['COLLECTION']]
+        self.tree = SchemaTree(self.colllection)
+        self.tree.print_tree()
+        with open('compiler/xpath1.lark', 'r') as f:
+            self.parser = Lark(f, start='location_path')
+        self.evaluator = XpathEvaluator1(self.tree)
 
     def solve(self, expr):
-        return expr
+        expr = expr.replace('/child::{}/child::{}'.format(self.config['COLLECTION'], self.config['COLLECTION_ITEM']), '/__root__')
+        res = self.parser.parse(expr)
+        print(res.pretty())
+        self.evaluator.transform(res)
+        res = self.colllection.aggregate(self.evaluator.pipeline_command)
+
+        ret = []
+        for obj in res:
+            for k, v in obj.items(): # assume there would be only one k-v pair
+                if isinstance(v, list):
+                    ret += [{k: item} for item in v]
+                else:
+                    ret.append({k: v})
+        ret = [json.dumps(r) for r in ret]
+        return ret
+
 
 if __name__ == '__main__':
-    test_parse()
+    pass
