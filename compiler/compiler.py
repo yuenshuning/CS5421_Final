@@ -28,7 +28,7 @@ def test_parse():
     with open('compiler/xpath1.lark', 'r') as f:
         parser = Lark(f, start='location_path')
     xpath = '/hobbies/indoor'
-    col = db_connect()['test']
+    col = db_connect()['library']
     tree = SchemaTree(col)
     tree.print_tree()
     evalualtor = XpathEvaluator1(tree)
@@ -37,6 +37,13 @@ def test_parse():
     res = col.aggregate(evalualtor.pipeline_command)
     for c in res:
         print(c)
+
+class Solver:
+    def __init__(self, config):
+        pass
+
+    def solve(self, expr):
+        return expr
 
 if __name__ == '__main__':
     test_parse()

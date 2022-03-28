@@ -67,6 +67,6 @@ class SchemaTree:
 if __name__ == '__main__':
     from mongodb_helper import db_connect
     db = db_connect()
-    col = db['test']
+    col = db['library']
     tree = SchemaTree(col)
     tree.print_tree()

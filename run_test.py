@@ -49,7 +49,8 @@ class ConvertXmlToJson:
         
 
 class TestJson(unittest.TestCase):
-    
+    XML_FILE = ''
+
     @classmethod
     def setUpClass(cls):
         print("starting...")
@@ -62,7 +63,7 @@ class TestJson(unittest.TestCase):
 
     @staticmethod
     def expect_output(xpath):
-        xml = etree.parse('test/library.xml')
+        xml = etree.parse(TestJson.XML_FILE)
         xml_data = xml.xpath(xpath)
 
         json_data = list(map(
@@ -72,47 +73,47 @@ class TestJson(unittest.TestCase):
 
         return json_data
 
-    def test01(self):
-        expr = "/child::{}/child::{}/child::songs/child::song/child::title".format(COLLECTION, COLLECTION_ITEM)
-        expected = self.expect_output(expr)
-        # actual_output = 
-        # self.assertEqual(expected, actual_output)
-        print(expected)
-    
-    def test02(self):
-        expr = "/child::{}/child::{}/child::songs/child::*".format(COLLECTION, COLLECTION_ITEM)
-        expected = self.expect_output(expr)
-        print(expected)
-
-    def test03(self):
-        expr = "/child::{}/child::{}[child::artists/child::artist/child::name='Kris Dayanti']/child::year".format(COLLECTION, COLLECTION_ITEM)
-        expected = self.expect_output(expr)
-        print(expected)
-    
-    def test04(self):
-        expr = "/child::{}/child::{}[child::year>=1990 and child::year <=1995]/child::title".format(COLLECTION, COLLECTION_ITEM)
-        expected = self.expect_output(expr)
-        print(expected)
-
-    def test05(self):
-        expr = "/child::{}/child::{}[child::year>=1990 and child::year <=1995]/descendant::title".format(COLLECTION, COLLECTION_ITEM)
-        expected = self.expect_output(expr)
-        print(expected)
-
-    def test06(self):
-        expr = "/child::{}/child::{}[child::year>=1990 and child::year <=1995]/child::songs/following-sibling::*".format(COLLECTION, COLLECTION_ITEM)
-        expected = self.expect_output(expr)
-        print(expected)
-
+    @staticmethod
+    def wrapper_test(expr, solver=None):
+        def func(self: unittest.TestCase):
+            expr_s = expr.format(COLLECTION, COLLECTION_ITEM)
+            expected = self.expect_output(expr_s)
+            if solver is not None:
+                solved = solver(expr_s)
+                self.assertEqual(expected, solved)
+            else:
+                print(expected)
+        return func
 
 
 if __name__ == '__main__':
-    FILE = 'test/library.json'
-    URI = 'mongodb://localhost:27017/'
-    DATABASE = 'cs5421'
+    import argparse
+    args = argparse.ArgumentParser()
+    args.add_argument('-c', '--config', default='./test/config.json')
+    args = args.parse_args()
+
+    config_path = args.config
+    with open(config_path, 'r') as f:
+        config = json.load(f)
+
+    solver = None
+    if config["solver"] == 'compiler':
+        import compiler
+        solver = compiler.Solver(config).solve
+    else:
+        pass
+
+    FILE = config['FILE']
+    URI = config['URI']
+    DATABASE = config['DATABASE']
     # COLLECTION = os.path.basename(FILE).split('.')[0]
-    COLLECTION = 'library'
-    COLLECTION_ITEM = 'album'
+    COLLECTION = config['COLLECTION']
+    COLLECTION_ITEM = config['COLLECTION_ITEM']
+
+    TestJson.XML_FILE = config['XML_FILE']
+    # bind method
+    for i, test_case in enumerate(config['test']):
+        setattr(TestJson, f'test{i + 1:02d}', TestJson.wrapper_test(test_case['expr'], solver=solver))
 
     suite = unittest.TestSuite(unittest.makeSuite(TestJson))
     unittest.TextTestRunner(verbosity=2).run(suite)

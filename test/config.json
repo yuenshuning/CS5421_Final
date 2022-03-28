@@ -1,0 +1,32 @@
+{
+    "FILE": "test/library.json",
+    "XML_FILE": "test/library.xml",
+    "URI": "mongodb://localhost:27017/",
+    "DATABASE": "cs5421",
+
+    "COLLECTION": "library",
+    "COLLECTION_ITEM": "album",
+
+    "solver": null,
+
+    "test": [
+        {
+            "expr": "/child::{}/child::{}/child::songs/child::song/child::title" 
+        },
+        {
+            "expr": "/child::{}/child::{}/child::songs/child::*"
+        },
+        {
+            "expr": "/child::{}/child::{}[child::artists/child::artist/child::name='Kris Dayanti']/child::year"
+        },
+        {
+            "expr": "/child::{}/child::{}[child::year>=1990 and child::year <=1995]/child::title"
+        },
+        {
+            "expr": "/child::{}/child::{}[child::year>=1990 and child::year <=1995]/descendant::title"
+        },
+        {
+            "expr": "/child::{}/child::{}[child::year>=1990 and child::year <=1995]/child::songs/following-sibling::*"
+        }
+    ]
+}
