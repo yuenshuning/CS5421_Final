@@ -4,6 +4,8 @@
 
 ```python
 pymongo
+xmltodict
+lxml
 ```
 
 #### Run Test
