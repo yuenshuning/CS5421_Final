@@ -5,8 +5,8 @@ import os
 from pymongo import MongoClient
 from lxml import etree
 
-class ImportJsonToMongo:
 
+class ImportJsonToMongo:
     def __init__(self, uri, database, file, collection):
         self.client = MongoClient(uri)
         self.database = database
@@ -25,8 +25,9 @@ class ImportJsonToMongo:
         mycol.drop()
         mycol.insert_many(dicts)
 
+
 class ConvertXmlToJson:
-    
+
     def __init__(self, input, output):
         self.input = input
         self.output = output
@@ -44,9 +45,9 @@ class ConvertXmlToJson:
         json_data = xmltodict.parse(xml_str, encoding='utf-8')
         json_data = json_data[COLLECTION][COLLECTION_ITEM]
         json_info = json.dumps(json_data, indent=2)
-        with open(self.output,'w',encoding='utf-8') as json_file:
+        with open(self.output, 'w', encoding='utf-8') as json_file:
             json_file.write(json_info)
-        
+
 
 class TestJson(unittest.TestCase):
     XML_FILE = ''
@@ -56,7 +57,7 @@ class TestJson(unittest.TestCase):
         print("starting...")
         import_json = ImportJsonToMongo(URI, DATABASE, FILE, COLLECTION)
         import_json.import_file()
-        
+
     @classmethod
     def tearDownClass(cls):
         print("closing...")
@@ -67,7 +68,8 @@ class TestJson(unittest.TestCase):
         xml_data = xml.xpath(xpath)
 
         json_data = list(map(
-            lambda x: json.dumps(xmltodict.parse(etree.tostring(x, encoding='utf-8').decode('utf-8'), encoding='utf-8')),
+            lambda x: json.dumps(
+                xmltodict.parse(etree.tostring(x, encoding='utf-8').decode('utf-8'), encoding='utf-8')),
             xml_data
         ))
 
@@ -83,11 +85,13 @@ class TestJson(unittest.TestCase):
                 self.assertEqual(expected, solved)
             else:
                 print(expected)
+
         return func
 
 
 if __name__ == '__main__':
     import argparse
+
     args = argparse.ArgumentParser()
     args.add_argument('-c', '--config', default='./test/config.json')
     args = args.parse_args()
@@ -99,6 +103,7 @@ if __name__ == '__main__':
     solver = None
     if config["solver"] == 'compiler':
         import compiler
+
         solver = compiler.Solver(config).solve
     else:
         pass

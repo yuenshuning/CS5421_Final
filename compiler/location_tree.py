@@ -1,6 +1,7 @@
 from typing import List
 from .schema_tree import SchemaTree, SchemaNode
 
+
 class LocationNode:
     def __init__(self):
         self.steps = []
@@ -12,11 +13,11 @@ class LocationNode:
         ret = []
         for axis, name, predicates in self.steps:
             if name != '__root__':
-                schema_nodes = schema_tree.find(schema_nodes, 'SLASH', name)
+                schema_nodes = schema_tree.find(schema_nodes, axis, name)
             for pr in predicates:
                 ret.append({
                     '$match': pr.generate(schema_tree, schema_nodes)
-                    })
+                })
         if is_top:
             project_dict = {}
             for node in schema_nodes:
@@ -27,8 +28,7 @@ class LocationNode:
             ret.append({
                 '$project': {
                     '_id': 0,
-                    **{k : v for k, v in project_dict.items()}
+                    **{k: v for k, v in project_dict.items()}
                 }
             })
         return ret, schema_nodes
-        
