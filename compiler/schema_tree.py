@@ -100,10 +100,10 @@ class SchemaTree:
         while parent is not None:
             is_following = False
             for child in parent.children:
-                if child == cur:
-                    is_following = True
                 if is_following:
                     new_nodes.extend(self._descendant_or_self(node, name))
+                if child == cur:
+                    is_following = True
             cur = parent
             parent = cur.parent
         return new_nodes
@@ -115,11 +115,11 @@ class SchemaTree:
             return new_nodes
         is_following = False
         for child in parent.children:
-            if child == node:
-                is_following = True
             if is_following:
                 if name == '*' or child.name == name:
                     new_nodes.append(child)
+            if child == node:
+                is_following = True
         return new_nodes
 
     def _namespace(self, node: SchemaNode, name):

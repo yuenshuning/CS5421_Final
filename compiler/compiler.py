@@ -48,7 +48,7 @@ class Solver:
         self.config = config
         self.colllection = db_connect(config['URI'], config['DATABASE'])[config['COLLECTION']]
         self.tree = SchemaTree(self.colllection)
-        self.tree.print_tree()
+        # self.tree.print_tree()
         with open('compiler/xpath1.lark', 'r') as f:
             self.parser = Lark(f, start='location_path')
         self.evaluator = XpathEvaluator1(self.tree)
@@ -56,7 +56,7 @@ class Solver:
     def solve(self, expr):
         expr = expr.replace('/child::{}/child::{}'.format(self.config['COLLECTION'], self.config['COLLECTION_ITEM']), '/__root__')
         res = self.parser.parse(expr)
-        print(res.pretty())
+        # print(res.pretty())
         node = self.evaluator.transform(res) # type: LocationNode
         aggs, _ = node.generate(self.tree, [self.tree.root], is_top=True)
         res = self.colllection.aggregate(aggs)

@@ -24,7 +24,7 @@ class LocationNode:
                 name = node.name
                 if name not in project_dict:
                     project_dict[name] = []
-                project_dict[name] = '$' + str(node)
+                project_dict[name].append('$' + str(node))
             ret.append({
                 '$project': {
                     '_id': 0,
