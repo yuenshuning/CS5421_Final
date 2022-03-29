@@ -10,6 +10,7 @@ else:
     from predicate_tree import PredicateNode
     from location_tree import LocationNode
 
+
 class XpathEvaluator1(Transformer):
     def __init__(self, tree: SchemaTree):
         super(Transformer, self).__init__()
@@ -30,8 +31,10 @@ class XpathEvaluator1(Transformer):
                 i += 1
             step = parts[i]  # type: Tree
             for j, child in enumerate(step.children):
+                if child.type == 'AXIS_NAME':
+                    axis = str(child.value).replace('-', '_')
                 if isinstance(child, Token) and child.type == 'NAME_TEST':
-                    name = child.value # type: str
+                    name = child.value  # type: str
                     node.add_step(axis=axis, name=name, predicates=step.children[j + 1:])
                     break
             i += 1
