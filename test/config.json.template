@@ -42,6 +42,9 @@
         },
         {
             "expr": "/child::{}/child::{}/child::songs[count(child::song) <= 2 and parent::*/descendant::country != 'Indonesia' and parent::*/descendant::country != 'United Kingdom']"
+        },
+        {
+            "expr": "/child::{}/child::{}[position()=last()-1]/descendant::title[following-sibling::*]"
         }
     ]
 }
