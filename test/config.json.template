@@ -27,6 +27,21 @@
         },
         {
             "expr": "/child::{}/child::{}[child::year>=1990 and child::year <=1995]/child::songs/following-sibling::*"
+        },
+        {
+            "expr": "/child::{}/child::{}/descendant::duration/preceding-sibling::*"
+        },
+        {
+            "expr": "/child::{}/child::{}/descendant::title/ancestor::song"
+        },
+        {
+            "expr": "/child::{}/child::{}/descendant::title[ancestor-or-self::song and (self::title='Yang Hilang' or self::title='Bua Hati')]"
+        },
+        {
+            "expr": "/child::{}/child::{}/child::songs[count(child::song) <= 2 and parent::*/descendant-or-self::country = 'Malaysia']"
+        },
+        {
+            "expr": "/child::{}/child::{}/child::songs[count(child::song) <= 2 and parent::*/descendant::country != 'Indonesia' and parent::*/descendant::country != 'United Kingdom']"
         }
     ]
 }

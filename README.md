@@ -6,6 +6,7 @@
 pymongo
 xmltodict
 lxml
+lark
 ```
 
 #### Run Test
