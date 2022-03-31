@@ -3,11 +3,11 @@ from lark.lexer import Token
 
 if __package__:
     from .schema_tree import SchemaTree
-    from .predicate_tree import PredicateNode
+    from .predicate_tree import PredicateNode, PredicateTree
     from .location_tree import LocationNode
 else:
     from schema_tree import SchemaTree
-    from predicate_tree import PredicateNode
+    from predicate_tree import PredicateNode, PredicateTree
     from location_tree import LocationNode
 
 
@@ -52,4 +52,8 @@ class XpathEvaluator1(Transformer):
 
     def predicate(self, parts):
         assert len(parts) == 1
-        return parts[0]
+        return PredicateTree(parts[0])
+
+    def function_call(self, parts):
+        name, args = parts[0], parts[1].children
+        return PredicateNode(None, name, None, args=args)

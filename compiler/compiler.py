@@ -63,11 +63,12 @@ class Solver:
 
         ret = []
         for obj in res:
-            for k, v in obj.items(): # assume there would be only one k-v pair
-                if isinstance(v, list):
-                    ret += [{k: item} for item in v]
-                else:
-                    ret.append({k: v})
+            for k, found_per_record in obj.items(): # assume there would be only one k-v pair
+                for v in found_per_record:
+                    if isinstance(v, list):
+                        ret += [{k: item} for item in v]
+                    else:
+                        ret.append({k: v})
         ret = [json.dumps(r) for r in ret]
         return ret
 

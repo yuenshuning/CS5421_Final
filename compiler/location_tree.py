@@ -15,9 +15,7 @@ class LocationNode:
             if name != '__root__':
                 schema_nodes = schema_tree.find(schema_nodes, axis, name)
             for pr in predicates:
-                ret.append({
-                    '$match': pr.generate(schema_tree, schema_nodes)
-                })
+                ret.extend(pr.generate(schema_tree, schema_nodes))
         if is_top:
             project_dict = {}
             for node in schema_nodes:
